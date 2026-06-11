@@ -4,7 +4,6 @@ import SecretKit
 import SecureEnclaveSecretKit
 import SmartCardSecretKit
 import SecretAgentKit
-import Brief
 import Observation
 import SSHProtocolKit
 import CertificateKit
@@ -35,7 +34,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         try? certsMigrator.migrate()
         return list
     }()
-    private let updater = Updater(checkOnLaunch: true)
     private let notifier = Notifier()
     private let publicKeyFileStoreController = PublicKeyFileStoreController(publicKeysURL: URL.publicKeyDirectory, certificatesURL: URL.certificatesDirectory)
     @MainActor private lazy var agent: Agent = {
@@ -78,16 +76,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         try? publicKeyFileStoreController.generatePublicKeys(for: storeList.allSecrets, clear: true)
         try? publicKeyFileStoreController.generateCertificates(for: EnvironmentValues._certificateStore.certificates, clear: true)
         notifier.prompt()
-        _ = withObservationTracking {
-            updater.update
-        } onChange: { [updater, notifier] in
-            Task {
-                guard !updater.currentVersion.isTestBuild else { return }
-                await notifier.notify(update: updater.update!) { release in
-                    await updater.ignore(release: release)
-                }
-            }
-        }
     }
 
 }

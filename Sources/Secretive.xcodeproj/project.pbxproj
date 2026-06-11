@@ -40,7 +40,6 @@
 		5066A6C22516F303004B5A36 /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5066A6C12516F303004B5A36 /* SetupView.swift */; };
 		5066A6C82516FE6E004B5A36 /* CopyableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5066A6C72516FE6E004B5A36 /* CopyableView.swift */; };
 		506772C92425BB8500034DED /* NoStoresView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506772C82425BB8500034DED /* NoStoresView.swift */; };
-		50692D1D2E6FDB880043C7BB /* SecretiveUpdater.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 50692D122E6FDB880043C7BB /* SecretiveUpdater.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		50692D282E6FDB8D0043C7BB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50692D242E6FDB8D0043C7BB /* main.swift */; };
 		50692D2D2E6FDC000043C7BB /* XPCWrappers in Frameworks */ = {isa = PBXBuildFile; productRef = 50692D2C2E6FDC000043C7BB /* XPCWrappers */; };
 		50692D2F2E6FDC2B0043C7BB /* SecretiveUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50692D2E2E6FDC290043C7BB /* SecretiveUpdater.swift */; };
@@ -49,7 +48,6 @@
 		50692E682E6FF9E20043C7BB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50692E632E6FF9E20043C7BB /* main.swift */; };
 		50692E692E6FF9E20043C7BB /* SecretAgentInputParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50692E642E6FF9E20043C7BB /* SecretAgentInputParser.swift */; };
 		50692E6C2E6FFA510043C7BB /* SecretAgentKit in Frameworks */ = {isa = PBXBuildFile; productRef = 50692E6B2E6FFA510043C7BB /* SecretAgentKit */; };
-		50692E6D2E6FFA5F0043C7BB /* SecretiveUpdater.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 50692D122E6FDB880043C7BB /* SecretiveUpdater.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		50692E702E6FFA6E0043C7BB /* SecretAgentInputParser.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 50692E502E6FF9D20043C7BB /* SecretAgentInputParser.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5079BA0F250F29BF00EA86F4 /* StoreListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5079BA0E250F29BF00EA86F4 /* StoreListView.swift */; };
 		508A58AA241E06B40069DC07 /* PreviewUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508A58A9241E06B40069DC07 /* PreviewUpdater.swift */; };
@@ -110,26 +108,12 @@
 			remoteGlobalIDString = 501577BC2E6BC5B4004A37D0;
 			remoteInfo = ReleasesDownloader;
 		};
-		50692D1B2E6FDB880043C7BB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 50617D7723FCE48D0099B055 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 50692D112E6FDB880043C7BB;
-			remoteInfo = SecretiveUpdater;
-		};
 		50692E592E6FF9D20043C7BB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 50617D7723FCE48D0099B055 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 50692E4F2E6FF9D20043C7BB;
 			remoteInfo = SecretAgentInputParser;
-		};
-		50692E6E2E6FFA5F0043C7BB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 50617D7723FCE48D0099B055 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 50692D112E6FDB880043C7BB;
-			remoteInfo = SecretiveUpdater;
 		};
 		50692E712E6FFA6E0043C7BB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -162,7 +146,6 @@
 			dstSubfolderSpec = 16;
 			files = (
 				50E2051D2FAAB81C00402380 /* SecretiveCertificateParser.xpc in Embed XPC Services */,
-				50692D1D2E6FDB880043C7BB /* SecretiveUpdater.xpc in Embed XPC Services */,
 				50692E5B2E6FF9D20043C7BB /* SecretAgentInputParser.xpc in Embed XPC Services */,
 			);
 			name = "Embed XPC Services";
@@ -174,7 +157,6 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
 			dstSubfolderSpec = 16;
 			files = (
-				50692E6D2E6FFA5F0043C7BB /* SecretiveUpdater.xpc in Embed XPC Services */,
 				50E2052D2FAAB92000402380 /* SecretiveCertificateParser.xpc in Embed XPC Services */,
 				50692E702E6FFA6E0043C7BB /* SecretAgentInputParser.xpc in Embed XPC Services */,
 			);
@@ -576,7 +558,6 @@
 			);
 			dependencies = (
 				50142167278126B500BBAA70 /* PBXTargetDependency */,
-				50692D1C2E6FDB880043C7BB /* PBXTargetDependency */,
 				50692E5A2E6FF9D20043C7BB /* PBXTargetDependency */,
 				50E2051C2FAAB81C00402380 /* PBXTargetDependency */,
 			);
@@ -652,7 +633,6 @@
 			);
 			dependencies = (
 				501577D42E6BC5DD004A37D0 /* PBXTargetDependency */,
-				50692E6F2E6FFA5F0043C7BB /* PBXTargetDependency */,
 				50692E722E6FFA6E0043C7BB /* PBXTargetDependency */,
 				50E2052F2FAAB92000402380 /* PBXTargetDependency */,
 			);
@@ -892,20 +872,10 @@
 			isa = PBXTargetDependency;
 			targetProxy = 501577D32E6BC5DD004A37D0 /* PBXContainerItemProxy */;
 		};
-		50692D1C2E6FDB880043C7BB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 50692D112E6FDB880043C7BB /* SecretiveUpdater */;
-			targetProxy = 50692D1B2E6FDB880043C7BB /* PBXContainerItemProxy */;
-		};
 		50692E5A2E6FF9D20043C7BB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 50692E4F2E6FF9D20043C7BB /* SecretAgentInputParser */;
 			targetProxy = 50692E592E6FF9D20043C7BB /* PBXContainerItemProxy */;
-		};
-		50692E6F2E6FFA5F0043C7BB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 50692D112E6FDB880043C7BB /* SecretiveUpdater */;
-			targetProxy = 50692E6E2E6FFA5F0043C7BB /* PBXContainerItemProxy */;
 		};
 		50692E722E6FFA6E0043C7BB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

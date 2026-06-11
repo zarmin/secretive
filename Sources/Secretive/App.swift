@@ -106,10 +106,7 @@ extension EnvironmentValues {
     private static let _agentLaunchController = AgentLaunchController()
     @Entry var agentLaunchController: any AgentLaunchControllerProtocol = _agentLaunchController
 
-    private static let _updater: any UpdaterProtocol = {
-        @AppStorage("defaultsHasRunSetup") var hasRunSetup = false
-        return Updater(checkOnLaunch: hasRunSetup)
-    }()
+    private static let _updater: any UpdaterProtocol = DisabledUpdater()
     @Entry var updater: any UpdaterProtocol = _updater
 
     private static let _justUpdatedChecker = JustUpdatedChecker()
@@ -122,6 +119,13 @@ extension EnvironmentValues {
     @MainActor var certificateStore: CertificateStore {
         EnvironmentValues._certificateStore
     }
+}
+
+/// Update checking is disabled in this fork; never reports an available update.
+@Observable private final class DisabledUpdater: UpdaterProtocol, Sendable {
+    var update: Release? { nil }
+    let currentVersion = SemVer(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0")
+    func ignore(release: Release) async {}
 }
 
 extension FocusedValues {
