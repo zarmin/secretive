@@ -1,7 +1,9 @@
 name: Release
 
-on: 
+on:
   push:
+    branches:
+      - '**'
     tags:
       - '*'
 jobs:
@@ -51,9 +53,14 @@ jobs:
         RUN_ID: ${{ github.run_id }}
         REPO: ${{ github.repository }}
       run: |
-            export CLEAN_TAG=$(echo $TAG_NAME | sed -e 's/refs\/tags\/v//')
-            sed -i '' -e "s/GITHUB_CI_VERSION/$CLEAN_TAG/g" Sources/Config/Config.xcconfig
-            sed -i '' -e "s/GITHUB_BUILD_NUMBER/1.$RUN_ID/g" Sources/Config/Config.xcconfig
+            if [[ "$TAG_NAME" == refs/tags/* ]]; then
+              export CLEAN_TAG=$(echo "$TAG_NAME" | sed -e 's|^refs/tags/||' -e 's|^v||')
+            else
+              # Branch push: mark as test build (0.0.0)
+              export CLEAN_TAG=0.0.0
+            fi
+            sed -i '' -e "s|GITHUB_CI_VERSION|$CLEAN_TAG|g" Sources/Config/Config.xcconfig
+            sed -i '' -e "s|GITHUB_BUILD_NUMBER|1.$RUN_ID|g" Sources/Config/Config.xcconfig
             sed -i '' -e "s|GITHUB_BUILD_URL|github.com/$REPO/actions/runs/$RUN_ID|g" Sources/Config/Config.xcconfig
     - name: Build
       run: xcrun xcodebuild -project Sources/Secretive.xcodeproj -scheme Secretive -configuration Release -archivePath Archive.xcarchive archive
@@ -79,6 +86,7 @@ jobs:
       with:
         subject-path: "Secretive.zip"
     - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TAG_NAME: ${{ github.ref }}
