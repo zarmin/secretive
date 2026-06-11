@@ -51,3 +51,20 @@ public struct XPCTypedSession<ResponseType: Codable & Sendable, ErrorType: Error
 
 }
 
+public extension Bundle {
+
+    /// Resolves the bundle identifier of an embedded XPC service from the running
+    /// bundle's identifier, so builds using a different base bundle ID (forks,
+    /// rebranded builds) still find their own embedded services.
+    static func xpcServiceIdentifier(_ serviceName: String) -> String {
+        guard let base = Bundle.main.bundleIdentifier?
+            .split(separator: ".")
+            .dropLast()
+            .joined(separator: "."), !base.isEmpty else {
+            return "com.maxgoedjen.Secretive.\(serviceName)"
+        }
+        return "\(base).\(serviceName)"
+    }
+
+}
+
