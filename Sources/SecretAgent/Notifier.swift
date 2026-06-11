@@ -68,6 +68,7 @@ final class Notifier: Sendable {
         notificationContent.subtitle = String(localized: .signedNotificationDescription(secretName: secret.name))
         notificationContent.userInfo[Constants.persistSecretIDKey] = secret.id.description
         notificationContent.userInfo[Constants.persistStoreIDKey] = store.id.description
+        notificationContent.threadIdentifier = secret.id.description
         notificationContent.interruptionLevel = .timeSensitive
         if await store.existingPersistedAuthenticationContext(secret: secret) == nil && secret.authenticationRequirement.required {
             notificationContent.categoryIdentifier = Constants.persistAuthenticationCategoryIdentitifier
