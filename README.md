@@ -9,6 +9,33 @@ Secretive is an app for protecting and managing SSH keys with the Secure Enclave
 </picture>
 
 
+## About This Fork
+
+This is a personal fork of [maxgoedjen/secretive](https://github.com/maxgoedjen/secretive) with the following changes:
+
+### Serialized Signing Prompts
+
+When multiple SSH connections request signatures at the same time (for example an ansible run against many hosts), signing requests are serialized so only one Touch ID prompt is shown at a time instead of a pile of overlapping prompts. Adapted from upstream PR [#780](https://github.com/maxgoedjen/secretive/pull/780).
+
+### Authentication Reuse Window
+
+After a successful signing authentication, the authenticated context is reused for a short window (10 seconds), so a parallel SSH fan-out asks for Touch ID once instead of once per host.
+
+### Update Checking Disabled
+
+The built-in updater is not built or used: the app never contacts GitHub's releases API.
+
+### Buildable with Personal Signing
+
+XPC service identifiers and the code signing team ID are resolved at runtime instead of being hardcoded, so the app works when built from source with your own bundle identifiers and development team (upstream's agent hangs in this configuration). This fork uses the `com.zarmin.Secretive.*` bundle identifiers.
+
+### Smaller Changes
+
+- Notifications about key access are grouped per secret.
+- The "Public Key" section in the secret detail view (removed upstream in the certificate UI refactor) is restored.
+
+Everything else matches upstream Secretive, documented below.
+
 ## Why?
 
 ### Safer Storage
