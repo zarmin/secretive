@@ -39,13 +39,16 @@ extension SecureEnclave {
         
         public func sign(data: Data, with secret: Secret, for provenance: SigningRequestProvenance) async throws -> Data {
             var context: LAContext
+            var freshContext: LAContext?
             if let existing = await persistentAuthenticationHandler.existingPersistedAuthenticationContext(secret: secret) {
                 context = unsafe existing.context
             } else {
                 let newContext = LAContext()
+                newContext.touchIDAuthenticationAllowableReuseDuration = Constants.autoPersistDuration
                 newContext.localizedReason = String(localized: .authContextRequestSignatureDescription(appName: provenance.origin.displayName, secretName: secret.name))
                 newContext.localizedCancelTitle = String(localized: .authContextRequestDenyButton)
                 context = newContext
+                freshContext = newContext
             }
 
             let queryAttributes = KeychainDictionary([
@@ -70,22 +73,32 @@ extension SecureEnclave {
             }
             let attributes = try JSONDecoder().decode(Attributes.self, from: attributesData)
 
+            let signature: Data
             switch attributes.keyType {
             case .ecdsa256:
                 let key = try CryptoKit.SecureEnclave.P256.Signing.PrivateKey(dataRepresentation: keyData, authenticationContext: context)
-                return try key.signature(for: data).rawRepresentation
+                signature = try key.signature(for: data).rawRepresentation
             case .mldsa65:
                 guard #available(macOS 26.0, *)  else { throw UnsupportedAlgorithmError() }
                 let key = try CryptoKit.SecureEnclave.MLDSA65.PrivateKey(dataRepresentation: keyData, authenticationContext: context)
-                return try key.signature(for: data)
+                signature = try key.signature(for: data)
             case .mldsa87:
                 guard #available(macOS 26.0, *)  else { throw UnsupportedAlgorithmError() }
                 let key = try CryptoKit.SecureEnclave.MLDSA87.PrivateKey(dataRepresentation: keyData, authenticationContext: context)
-                return try key.signature(for: data)
+                signature = try key.signature(for: data)
             default:
                 throw UnsupportedAlgorithmError()
             }
 
+            if let freshContext, secret.authenticationRequirement.required {
+                await persistentAuthenticationHandler.cacheAuthenticatedContext(
+                    secret: secret,
+                    context: freshContext,
+                    duration: Constants.autoPersistDuration
+                )
+            }
+
+            return signature
         }
 
         public func existingPersistedAuthenticationContext(secret: Secret) async -> PersistedAuthenticationContext? {
@@ -289,6 +302,10 @@ extension SecureEnclave.Store {
         static let keyClass = kSecClassGenericPassword as String
         static let keyTag = Data("com.maxgoedjen.secretive.secureenclave.key".utf8)
         static let notificationToken = UUID().uuidString
+        /// Window during which the LAContext from a just-completed signing is
+        /// reused to skip the TouchID prompt on subsequent sign requests.
+        /// Sized for the parallel-ssh case (e.g. ansible against many hosts).
+        static let autoPersistDuration: TimeInterval = 10
     }
     
     struct UnsupportedAlgorithmError: Error {}

@@ -65,5 +65,13 @@ package actor PersistentAuthenticationHandler<SecretType: Secret>: Sendable {
         persistedAuthenticationContexts[secret] = context
     }
 
+    /// Stashes an already-authenticated LAContext for short-window reuse without re-prompting.
+    /// - Note: The caller is responsible for ensuring `context` has already been authenticated
+    ///   (e.g. by being passed to a Secure Enclave key operation that succeeded).
+    package func cacheAuthenticatedContext(secret: SecretType, context: LAContext, duration: TimeInterval) {
+        let wrapped = PersistentAuthenticationContext(secret: secret, context: context, duration: duration)
+        persistedAuthenticationContexts[secret] = wrapped
+    }
+
 }
 
