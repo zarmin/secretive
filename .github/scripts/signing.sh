@@ -17,6 +17,8 @@ echo $AGENT_PROFILE_DATA | base64 -d -o Agent.provisionprofile
 AGENT_UUID=`grep UUID -A1 -a Agent.provisionprofile | grep -io "[-A-F0-9]\{36\}"`
 cp Agent.provisionprofile ~/Library/MobileDevice/Provisioning\ Profiles/$AGENT_UUID.provisionprofile
 
-# Create directories for ASC key
-mkdir ~/.private_keys
-echo -n "$APPLE_API_KEY_DATA" > ~/.private_keys/AuthKey_$APPLE_API_KEY_ID.p8
+# Create directories for ASC key (only needed for notarization)
+if [ -n "$APPLE_API_KEY_DATA" ]; then
+    mkdir ~/.private_keys
+    echo -n "$APPLE_API_KEY_DATA" > ~/.private_keys/AuthKey_$APPLE_API_KEY_ID.p8
+fi

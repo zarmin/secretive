@@ -10,7 +10,7 @@ Update description
 
 
 ## Build
-https://github.com/maxgoedjen/secretive/actions/runs/RUN_ID
+https://github.com/zarmin/secretive/actions/runs/RUN_ID
 
 ## Attestation
-https://github.com/maxgoedjen/secretive/attestations/ATTESTATION_ID
+https://github.com/zarmin/secretive/attestations/ATTESTATION_ID
