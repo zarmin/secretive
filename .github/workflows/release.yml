@@ -89,11 +89,11 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TAG_NAME: ${{ github.ref }}
+        TAG_NAME: ${{ github.ref_name }}
         RUN_ID: ${{ github.run_id }}
         ATTESTATION_ID: ${{ steps.attest.outputs.attestation-id }}
       run: |
             sed -i.tmp "s/RUN_ID/$RUN_ID/g" .github/templates/release.md
             sed -i.tmp "s/ATTESTATION_ID/$ATTESTATION_ID/g" .github/templates/release.md
-            gh release create $TAG_NAME -d -F .github/templates/release.md
-            gh release upload $TAG_NAME Secretive.zip
+            gh release create "$TAG_NAME" -d -F .github/templates/release.md || true
+            gh release upload "$TAG_NAME" Secretive.zip --clobber
