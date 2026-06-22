@@ -17,9 +17,9 @@ This is a personal fork of [maxgoedjen/secretive](https://github.com/maxgoedjen/
 
 When multiple SSH connections request signatures at the same time (for example an ansible run against many hosts), signing requests are serialized so only one Touch ID prompt is shown at a time instead of a pile of overlapping prompts. Adapted from upstream PR [#780](https://github.com/maxgoedjen/secretive/pull/780).
 
-### Authentication Reuse Window
+### Authentication Reuse Window (per key)
 
-After a successful signing authentication, the authenticated context is reused for a short window (10 seconds), so a parallel SSH fan-out asks for Touch ID once instead of once per host.
+After a successful signing authentication, the authenticated context can be reused for a short window, so a parallel SSH fan-out (e.g. ansible against many hosts) asks for Touch ID once instead of once per host. This is configurable **per key** in the create and edit sheets — **Off** (authenticate on every signature), 5, 10, or 30 seconds. It defaults to **Off**, preserving strict per-signature authentication; opt in only for the keys where you need it.
 
 ### Update Checking Disabled
 

@@ -28,6 +28,12 @@ public extension Secret {
         attributes.publicKeyAttribution
     }
 
+    /// How long a successful authentication may be reused before this key prompts again.
+    /// Absent (`nil`) attributes are treated as ``AuthenticationReuseWindow/off``.
+    var reuseWindow: AuthenticationReuseWindow {
+        attributes.authenticationReuseWindow ?? .off
+    }
+
 }
 
 /// The type of algorithm the Secret uses.

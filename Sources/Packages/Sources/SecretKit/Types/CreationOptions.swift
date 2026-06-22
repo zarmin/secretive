@@ -12,20 +12,49 @@ public struct Attributes: Sendable, Codable, Hashable {
     /// If nil, a default value will be used.
     public var publicKeyAttribution: String?
 
+    /// How long an authentication may be reused before a key that requires authentication prompts again.
+    /// If nil, the key is treated as ``AuthenticationReuseWindow/off`` (authenticate on every signature).
+    public var authenticationReuseWindow: AuthenticationReuseWindow?
+
     public init(
         keyType: KeyType,
         authentication: AuthenticationRequirement,
-        publicKeyAttribution: String? = nil
+        publicKeyAttribution: String? = nil,
+        authenticationReuseWindow: AuthenticationReuseWindow? = nil
     ) {
         self.keyType = keyType
         self.authentication = authentication
         self.publicKeyAttribution = publicKeyAttribution
+        self.authenticationReuseWindow = authenticationReuseWindow
     }
 
     public struct UnsupportedOptionError: Error {
         package init() {}
     }
-    
+
+}
+
+/// How long a successful authentication may be reused for a key that requires authentication, before the user is
+/// prompted again. Sized for parallel-ssh / fan-out workloads where one operation triggers many signatures at once.
+public enum AuthenticationReuseWindow: String, CaseIterable, Hashable, Sendable, Codable, Identifiable {
+
+    /// Authenticate on every signature (no reuse).
+    case off
+    case fiveSeconds
+    case tenSeconds
+    case thirtySeconds
+
+    public var id: AuthenticationReuseWindow { self }
+
+    /// The reuse window in seconds. `0` for ``off``.
+    public var duration: TimeInterval {
+        switch self {
+        case .off: 0
+        case .fiveSeconds: 5
+        case .tenSeconds: 10
+        case .thirtySeconds: 30
+        }
+    }
 }
 
 /// The option specified

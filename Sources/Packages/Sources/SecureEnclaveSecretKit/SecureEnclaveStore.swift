@@ -38,13 +38,18 @@ extension SecureEnclave {
         // MARK: SecretStore
         
         public func sign(data: Data, with secret: Secret, for provenance: SigningRequestProvenance) async throws -> Data {
+            // The per-key authentication reuse window. `.off` means authenticate on every signature.
+            let reuseWindow = secret.reuseWindow
             var context: LAContext
             var freshContext: LAContext?
             if let existing = await persistentAuthenticationHandler.existingPersistedAuthenticationContext(secret: secret) {
                 context = unsafe existing.context
             } else {
                 let newContext = LAContext()
-                newContext.touchIDAuthenticationAllowableReuseDuration = Constants.autoPersistDuration
+                if reuseWindow != .off {
+                    // Native reuse is capped by the OS at 10s; longer windows rely on the cached-context path below.
+                    newContext.touchIDAuthenticationAllowableReuseDuration = min(reuseWindow.duration, 10)
+                }
                 newContext.localizedReason = String(localized: .authContextRequestSignatureDescription(appName: provenance.origin.displayName, secretName: secret.name))
                 newContext.localizedCancelTitle = String(localized: .authContextRequestDenyButton)
                 context = newContext
@@ -90,11 +95,13 @@ extension SecureEnclave {
                 throw UnsupportedAlgorithmError()
             }
 
-            if let freshContext, secret.authenticationRequirement.required {
+            if let freshContext, reuseWindow != .off, secret.authenticationRequirement.required {
+                // Keep the just-authenticated context around so signatures within the window skip the prompt.
+                // The handler's monotonic-clock expiry enforces the full duration, including windows above 10s.
                 await persistentAuthenticationHandler.cacheAuthenticatedContext(
                     secret: secret,
                     context: freshContext,
-                    duration: Constants.autoPersistDuration
+                    duration: reuseWindow.duration
                 )
             }
 
@@ -302,10 +309,6 @@ extension SecureEnclave.Store {
         static let keyClass = kSecClassGenericPassword as String
         static let keyTag = Data("com.maxgoedjen.secretive.secureenclave.key".utf8)
         static let notificationToken = UUID().uuidString
-        /// Window during which the LAContext from a just-completed signing is
-        /// reused to skip the TouchID prompt on subsequent sign requests.
-        /// Sized for the parallel-ssh case (e.g. ansible against many hosts).
-        static let autoPersistDuration: TimeInterval = 10
     }
     
     struct UnsupportedAlgorithmError: Error {}

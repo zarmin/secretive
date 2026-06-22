@@ -8,6 +8,7 @@ struct EditSecretView<StoreType: SecretStoreModifiable>: View {
 
     @State private var name: String
     @State private var publicKeyAttribution: String
+    @State private var reuseWindow: AuthenticationReuseWindow
     @State var errorText: String?
 
     @Environment(\.dismiss) var dismiss
@@ -17,6 +18,7 @@ struct EditSecretView<StoreType: SecretStoreModifiable>: View {
         self.secret = secret
         name = secret.name
         publicKeyAttribution = secret.publicKeyAttribution ?? ""
+        reuseWindow = secret.reuseWindow
     }
 
     var body: some View {
@@ -29,6 +31,9 @@ struct EditSecretView<StoreType: SecretStoreModifiable>: View {
                         Text(.createSecretKeyAttributionDescription)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                    }
+                    if secret.authenticationRequirement.required {
+                        ReuseWindowPicker(selection: $reuseWindow)
                     }
                 } footer: {
                     if let errorText {
@@ -55,6 +60,7 @@ struct EditSecretView<StoreType: SecretStoreModifiable>: View {
     func rename() {
         var attributes = secret.attributes
         attributes.publicKeyAttribution = publicKeyAttribution.isEmpty ? nil : publicKeyAttribution
+        attributes.authenticationReuseWindow = secret.authenticationRequirement.required ? reuseWindow : nil
         Task {
             do {
                 try await store.update(secret: secret, name: name, attributes: attributes)

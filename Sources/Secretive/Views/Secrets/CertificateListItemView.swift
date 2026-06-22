@@ -3,7 +3,6 @@ import CertificateKit
 import SSHProtocolKit
 
 struct CertificateListItemView: View {
-
     @Environment(\.certificateStore) private var store
 
     var certificate: Certificate

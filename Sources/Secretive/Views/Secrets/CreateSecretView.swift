@@ -10,6 +10,7 @@ struct CreateSecretView<StoreType: SecretStoreModifiable>: View {
     @State private var name = ""
     @State private var keyAttribution = ""
     @State private var authenticationRequirement: AuthenticationRequirement = .presenceRequired
+    @State private var reuseWindow: AuthenticationReuseWindow = .off
     @State private var keyType: KeyType?
     @State var advanced = false
     @State var errorText: String?
@@ -67,6 +68,10 @@ struct CreateSecretView<StoreType: SecretStoreModifiable>: View {
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 3)
                                 .boxBackground(color: .red)
+                        }
+                        if authenticationRequirement.required {
+                            Divider()
+                            ReuseWindowPicker(selection: $reuseWindow)
                         }
 
                     }
@@ -146,7 +151,8 @@ struct CreateSecretView<StoreType: SecretStoreModifiable>: View {
                     attributes: .init(
                         keyType: keyType!,
                         authentication: authenticationRequirement,
-                        publicKeyAttribution: attribution
+                        publicKeyAttribution: attribution,
+                        authenticationReuseWindow: authenticationRequirement.required ? reuseWindow : nil
                     )
                 )
                 createdSecret(AnySecret(new))
@@ -155,6 +161,35 @@ struct CreateSecretView<StoreType: SecretStoreModifiable>: View {
                 errorText = error.localizedDescription
             }
         }
+    }
+
+}
+
+/// Per-key picker for the authentication reuse window. Shared by the create and edit sheets.
+struct ReuseWindowPicker: View {
+
+    @Binding var selection: AuthenticationReuseWindow
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Picker("Reauthentication window", selection: $selection) {
+                ForEach(AuthenticationReuseWindow.allCases) { window in
+                    Text(Self.label(for: window))
+                        .tag(window)
+                }
+            }
+            Text("After you authenticate, additional signatures for this key within this window are allowed without prompting again. \"Off\" requires authentication for every signature.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    static func label(for window: AuthenticationReuseWindow) -> String {
+        guard window != .off else { return String(localized: "Off") }
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = [.second]
+        return formatter.string(from: window.duration) ?? "\(Int(window.duration)) seconds"
     }
 
 }
